@@ -1,0 +1,1 @@
+This mod allows you to customize the behavior of long-handed inserters, giving you the option to either remove them entirely or adjust their arm length to match regular inserters, while making them slightly faster. It is recommended to use this mod alongside others that allow you to fine-tune inserter pickup and drop distances for greater flexibility.
