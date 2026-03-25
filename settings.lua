@@ -2,13 +2,17 @@
 
 data:extend({
     {
-        type = "string-setting",
-        name = "long-inserter-setting",
+        type = "bool-setting",
+        name = "bbl-remove-krastorio2-inserters",
         setting_type = "startup",
-        default_value = "remove",
-        allowed_values = {"remove", "intermediate"},
-        localised_name = {"mod-setting.long-inserter-setting-name"},
-        localised_description = {"mod-setting.long-inserter-setting-description"},
+        default_value = true,
         order = "a"
+    },
+    {
+        type = "bool-setting",
+        name = "bbl-remove-factorio-plus-inserters",
+        setting_type = "startup",
+        default_value = true,
+        order = "b"
     }
 })
