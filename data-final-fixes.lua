@@ -46,19 +46,15 @@ end
 -- Helper to safely add an item to an existing component list, merging exact matches
 local function insert_or_merge_component(list, comp)
     local found = false
-    local c_name = comp.name or comp[1]
-    local c_amt = comp.amount or comp[2] or 1
+    local c_name = comp.name
+    local c_amt = comp.amount or 1
     local c_type = comp.type or "item"
     
     for _, existing in pairs(list) do
-        local e_name = existing.name or existing[1]
+        local e_name = existing.name
         local e_type = existing.type or "item"
         if e_name == c_name and e_type == c_type then
-            if existing.amount then
-                existing.amount = existing.amount + c_amt
-            else
-                existing[2] = existing[2] + c_amt
-            end
+            existing.amount = (existing.amount or 1) + c_amt
             found = true
             break
         end
@@ -77,25 +73,20 @@ local function apply_replacements(item_list)
     -- Iterate backwards safely because we might remove elements
     for i = #item_list, 1, -1 do
         local comp = item_list[i]
-        local name = comp.name or comp[1]
-        local removal_data = bye_bye_long_inserter.removals[name]
+        local removal_data = bye_bye_long_inserter.removals[comp.name]
         
         if removal_data then
-            local multiplier = removal_data.use_amount_multiplier and (comp.amount or comp[2] or 1) or 1
+            local multiplier = removal_data.use_amount_multiplier and (comp.amount or 1) or 1
             
             -- Remove the original "long" inserter
             table.remove(item_list, i)
             
             -- Queue the new replacement components, scaled by the multiplier
             for _, new_ing in pairs(removal_data.new_ingredients) do
-                local r_name = new_ing.name or new_ing[1]
-                local r_amt = new_ing.amount or new_ing[2] or 1
-                local r_type = new_ing.type or "item"
-                
                 table.insert(additions, {
-                    type = r_type,
-                    name = r_name,
-                    amount = r_amt * multiplier
+                    type = new_ing.type or "item",
+                    name = new_ing.name,
+                    amount = (new_ing.amount or 1) * multiplier
                 })
             end
         end
@@ -113,17 +104,8 @@ for recipe_name, recipe in pairs(data.raw.recipe) do
         -- Process Ingredients
         apply_replacements(recipe.ingredients)
         
-        -- Process Results
-        if recipe.result then
-            -- If string result, convert to table format if it matches a removal
-            if bye_bye_long_inserter.removals[recipe.result] then
-                local res_amt = recipe.result_count or 1
-                recipe.results = {{type = "item", name = recipe.result, amount = res_amt}}
-                recipe.result = nil
-                recipe.result_count = nil
-                apply_replacements(recipe.results)
-            end
-        elseif recipe.results then
+        -- Process Results (Factorio 2.0 strictly uses recipe.results array)
+        if recipe.results then
             apply_replacements(recipe.results)
         end
     end
