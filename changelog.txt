@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 26. 03. 2026
+  Features:
+    - Completely re-architected the mod for Factorio 2.0 with a new dynamic replacement API.
+    - Added automated ingredient deduction and multiplier matching for removed inserters.
+    - Added comprehensive Factoriopedia masking and `next_upgrade` tracking fixes for Krastorio 2.
+    - Added individual settings toggles for Krastorio 2 and Factorio+ that automatically hide when inactive.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.0.1
 Date: 21. 10. 2024
   Features:
