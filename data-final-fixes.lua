@@ -9,17 +9,22 @@ for inserter_name, removal_data in pairs(bye_bye_long_inserter.removals) do
     for _, mr in pairs(removal_data.main_recipes) do
         is_main_recipe[mr] = true
     end
-    
+
     -- Grab replacement ingredients from the FIRST main recipe if omitted
     if not removal_data.new_ingredients then
         local first_recipe = data.raw.recipe[removal_data.main_recipes[1]]
         removal_data.new_ingredients = first_recipe and first_recipe.ingredients or {}
     end
-    
+
     -- Hide the item itself to try preventing uncrafting/generation issues
     if data.raw.item[inserter_name] then
         data.raw.item[inserter_name].hidden = true
         data.raw.item[inserter_name].hidden_in_factoriopedia = true
+    end
+
+    if data.raw.inserter[inserter_name] then
+        data.raw.inserter[inserter_name].hidden = true
+        data.raw.inserter[inserter_name].hidden_in_factoriopedia = true
     end
 end
 
@@ -49,7 +54,7 @@ local function insert_or_merge_component(list, comp)
     local c_name = comp.name
     local c_amt = comp.amount or 1
     local c_type = comp.type or "item"
-    
+
     for _, existing in pairs(list) do
         local e_name = existing.name
         local e_type = existing.type or "item"
@@ -59,9 +64,9 @@ local function insert_or_merge_component(list, comp)
             break
         end
     end
-    
+
     if not found then
-        table.insert(list, {type = c_type, name = c_name, amount = c_amt})
+        table.insert(list, { type = c_type, name = c_name, amount = c_amt })
     end
 end
 
@@ -69,18 +74,18 @@ end
 local function apply_replacements(item_list)
     if not item_list then return end
     local additions = {}
-    
+
     -- Iterate backwards safely because we might remove elements
     for i = #item_list, 1, -1 do
         local comp = item_list[i]
         local removal_data = bye_bye_long_inserter.removals[comp.name]
-        
+
         if removal_data then
             local multiplier = removal_data.use_amount_multiplier and (comp.amount or 1) or 1
-            
+
             -- Remove the original "long" inserter
             table.remove(item_list, i)
-            
+
             -- Queue the new replacement components, scaled by the multiplier
             for _, new_ing in pairs(removal_data.new_ingredients) do
                 table.insert(additions, {
@@ -91,7 +96,7 @@ local function apply_replacements(item_list)
             end
         end
     end
-    
+
     -- Append our queued replacement components merging duplicate definitions safely
     for _, add in pairs(additions) do
         insert_or_merge_component(item_list, add)
@@ -103,7 +108,7 @@ for recipe_name, recipe in pairs(data.raw.recipe) do
     if not is_main_recipe[recipe_name] then
         -- Process Ingredients
         apply_replacements(recipe.ingredients)
-        
+
         -- Process Results (Factorio 2.0 strictly uses recipe.results array)
         if recipe.results then
             apply_replacements(recipe.results)
