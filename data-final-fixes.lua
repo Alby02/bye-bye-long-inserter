@@ -28,6 +28,13 @@ for inserter_name, removal_data in pairs(bye_bye_long_inserter.removals) do
     end
 end
 
+-- Clear next_upgrade links pointing to hidden removed inserters to prevent validation crashes
+for _, inserter in pairs(data.raw.inserter) do
+    if inserter.next_upgrade and bye_bye_long_inserter.removals[inserter.next_upgrade] then
+        inserter.next_upgrade = nil
+    end
+end
+
 -- Completely hide, disable, and disconnect the main recipes
 for main_recipe_name, _ in pairs(is_main_recipe) do
     local recipe = data.raw.recipe[main_recipe_name]
